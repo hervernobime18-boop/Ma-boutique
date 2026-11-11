@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Administration – Ma Boutique</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{background:var(--bg)}
+    .wrap{max-width:980px;margin:0 auto;padding:20px}
+    .panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+    .panel h2{margin:0 0 14px;font-size:1.25rem}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row.three{grid-template-columns:1fr 1fr 1fr}
+    label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;font-weight:600;color:var(--muted)}
+    input,textarea,select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;color:var(--ink);background:#fff}
+    .full-w{grid-column:1/-1}
+    .preview{display:flex;align-items:center;gap:12px;margin-top:6px}
+    .preview img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+    .btn.danger{background:#fee2e2;color:#b91c1c}
+    .list-item{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+    .list-item .ico{width:56px;height:56px;border-radius:10px;background:var(--accent);display:grid;place-items:center;font-size:1.8rem;overflow:hidden}
+    .list-item .ico img{width:100%;height:100%;object-fit:cover}
+    .list-item small{color:var(--muted)}
+    .mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.85rem}
+    .notice{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px 14px;font-size:.92rem}
+    .notice.ok{background:#ecfdf5;border-color:#a7f3d0}
+    #login{max-width:360px;margin:12vh auto;text-align:center}
+    #login input{width:100%;margin:12px 0}
+    .err{color:#b91c1c;min-height:1.2em;font-size:.9rem}
+    @media(max-width:700px){.row,.row.three{grid-template-columns:1fr}.list-item{grid-template-columns:48px 1fr}.list-item .acts{grid-column:1/-1}}
+  </style>
+</head>
+<body>
+
+<!-- Connexion -->
+<div id="login" class="panel">
+  <h2>🔒 Espace administrateur</h2>
+  <input id="pwd" type="password" placeholder="Mot de passe" autocomplete="current-password">
+  <div class="err" id="loginErr"></div>
+  <button class="btn primary full" id="loginBtn">Entrer</button>
+</div>
+
+<!-- Application -->
+<div id="app" class="wrap" hidden>
+  <div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <h2 style="margin:0">Gérer mes articles</h2>
+    <a class="btn ghost" href="index.html" target="_blank">Voir la boutique ↗</a>
+  </div>
+
+  <div class="notice" id="dirty" hidden>
+    ⚠️ Vous avez des modifications non publiées. Cliquez sur <b>« Télécharger products.js »</b> puis remplacez ce fichier sur votre hébergeur pour que les visiteurs voient vos changements.
+  </div>
+
+  <div class="panel" style="margin-top:20px">
+    <h2 id="formTitle">Publier un nouvel article</h2>
+    <form id="form">
+      <div class="row">
+        <label>Nom de l'article
+          <input name="name" required maxlength="80" placeholder="Ex : Robe en pagne wax">
+        </label>
+        <label>Prix (FCFA)
+          <input name="price" type="number" min="0" step="1" required placeholder="Ex : 15000">
+        </label>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <label>Catégorie
+          <input name="category" list="cats" required placeholder="Ex : Mode">
+          <datalist id="cats"></datalist>
+        </label>
+        <label>Emoji (si pas de photo)
+          <input name="icon" maxlength="4" placeholder="🛍️">
+        </label>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <label class="full-w">Description
+          <textarea name="desc" rows="2" maxlength="200" placeholder="Quelques mots sur l'article"></textarea>
+        </label>
+        <label class="full-w">Photo
+          <input type="file" id="photo" accept="image/*">
+          <span class="preview" id="preview" hidden>
+            <img id="previewImg" alt="">
+            <button type="button" class="mini" id="removePhoto">Retirer la photo</button>
+          </span>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn primary" type="submit" id="saveBtn">Ajouter l'article</button>
+        <button class="btn ghost" type="button" id="cancelEdit" hidden>Annuler la modification</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Mes articles (<span id="count">0</span>)</h2>
+    <div id="list"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Publier sur le site</h2>
+    <p style="margin-top:0;color:var(--muted)">Les changements ne sont visibles par vos clients qu'après avoir remplacé <b>products.js</b> sur votre hébergeur.</p>
+    <div class="actions" style="margin-top:0">
+      <button class="btn primary" id="download">⬇ Télécharger products.js</button>
+      <button class="btn danger" id="reset">Revenir à la version publiée</button>
+      <button class="btn ghost" id="logout">Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="products.js"></script>
+<script>
+/* Mot de passe de la page admin – CHANGEZ-LE.
+   Attention : ce mot de passe n'est qu'un verrou de confort. La vraie sécurité,
+   c'est que seul vous pouvez envoyer products.js sur votre hébergeur. */
+const ADMIN_PASSWORD = "admin1234";
+
+const $ = (s) => document.querySelector(s);
+const KEY = "boutique_admin_draft";
+const PUBLISHED = JSON.parse(JSON.stringify(PRODUCTS));
+let items = JSON.parse(localStorage.getItem(KEY) || "null") || JSON.parse(JSON.stringify(PUBLISHED));
+let editingId = null;
+let photoData = "";
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => Number(n).toLocaleString("fr-FR") + " FCFA";
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),1800);}
+
+/* ---- Connexion ---- */
+function unlock(){ $("#login").hidden = true; $("#app").hidden = false; render(); }
+$("#loginBtn").onclick = () => {
+  if ($("#pwd").value === ADMIN_PASSWORD) { sessionStorage.setItem("adm", "1"); unlock(); }
+  else $("#loginErr").textContent = "Mot de passe incorrect.";
+};
+$("#pwd").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
+$("#logout").onclick = () => { sessionStorage.removeItem("adm"); location.reload(); };
+if (sessionStorage.getItem("adm")) unlock();
+
+/* ---- Brouillon ---- */
+function persist(){
+  try { localStorage.setItem(KEY, JSON.stringify(items)); }
+  catch { toast("Mémoire pleine : utilisez des photos plus légères."); }
+  render();
+}
+const isDirty = () => JSON.stringify(items) !== JSON.stringify(PUBLISHED);
+
+function render(){
+  $("#count").textContent = items.length;
+  $("#dirty").hidden = !isDirty();
+  $("#cats").innerHTML = [...new Set(items.map(p => p.category))].map(c => `<option value="${esc(c)}">`).join("");
+  $("#list").innerHTML = items.length ? items.map(p => `
+    <div class="list-item">
+      <div class="ico">${p.image ? `<img src="${p.image}" alt="">` : esc(p.icon || "🛍️")}</div>
+      <div><b>${esc(p.name)}</b><br><small>${esc(p.category)} · ${fmt(p.price)}</small></div>
+      <div class="acts">
+        <button class="mini" data-edit="${p.id}">Modifier</button>
+        <button class="mini" data-del="${p.id}">Supprimer</button>
+      </div>
+    </div>`).join("") : `<p class="empty">Aucun article pour le moment.</p>`;
+}
+
+/* ---- Photo : redimensionnée et compressée ---- */
+function setPhoto(data){
+  photoData = data || "";
+  $("#preview").hidden = !photoData;
+  if (photoData) $("#previewImg").src = photoData;
+}
+$("#photo").addEventListener("change", (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 700, r = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      setPhoto(c.toDataURL("image/jpeg", 0.72));
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+});
+$("#removePhoto").onclick = () => { setPhoto(""); $("#photo").value = ""; };
+
+/* ---- Formulaire ---- */
+function resetForm(){
+  editingId = null; $("#form").reset(); setPhoto("");
+  $("#formTitle").textContent = "Publier un nouvel article";
+  $("#saveBtn").textContent = "Ajouter l'article";
+  $("#cancelEdit").hidden = true;
+}
+$("#cancelEdit").onclick = resetForm;
+
+$("#form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const data = {
+    name: f.get("name").trim(),
+    category: f.get("category").trim(),
+    price: Math.max(0, Math.round(Number(f.get("price")))),
+    icon: (f.get("icon") || "").trim() || "🛍️",
+    desc: f.get("desc").trim(),
+  };
+  if (photoData) data.image = photoData;
+  if (editingId) {
+    const i = items.findIndex(p => p.id === editingId);
+    items[i] = { id: editingId, ...data };
+    toast("Article modifié ✓");
+  } else {
+    const id = items.reduce((m, p) => Math.max(m, p.id), 0) + 1;
+    items.unshift({ id, ...data });
+    toast("Article ajouté ✓");
+  }
+  resetForm(); persist();
+});
+
+$("#list").addEventListener("click", (e) => {
+  const t = e.target;
+  if (t.dataset.del) {
+    if (confirm("Supprimer cet article ?")) { items = items.filter(p => p.id != t.dataset.del); persist(); }
+  }
+  if (t.dataset.edit) {
+    const p = items.find(x => x.id == t.dataset.edit); if (!p) return;
+    editingId = p.id;
+    const f = $("#form");
+    f.name.value = p.name; f.price.value = p.price; f.category.value = p.category;
+    f.icon.value = p.icon || ""; f.desc.value = p.desc || "";
+    setPhoto(p.image || "");
+    $("#formTitle").textContent = "Modifier l'article";
+    $("#saveBtn").textContent = "Enregistrer";
+    $("#cancelEdit").hidden = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
+
+/* ---- Export ---- */
+$("#download").onclick = () => {
+  const header = "/* Fichier généré par admin.html – remplacez products.js sur votre hébergeur après chaque modification. */\n";
+  const body = "const PRODUCTS = " + JSON.stringify(items, null, 2) + ";\n";
+  const blob = new Blob([header + body], { type: "text/javascript" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "products.js";
+  document.body.appendChild(a); a.click(); a.remove();
+  toast("products.js téléchargé ✓");
+};
+$("#reset").onclick = () => {
+  if (confirm("Abandonner vos modifications non publiées ?")) {
+    localStorage.removeItem(KEY); items = JSON.parse(JSON.stringify(PUBLISHED)); resetForm(); render();
+  }
+};
+</script>
+</body>
+</html>

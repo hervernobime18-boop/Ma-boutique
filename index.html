@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ma Boutique – Boutique en ligne</title>
+  <meta name="description" content="Découvrez nos produits et commandez facilement via WhatsApp.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#top" id="brandName">Ma Boutique</a>
+  <div class="search">
+    <input id="search" type="search" placeholder="Rechercher un produit…" aria-label="Rechercher">
+  </div>
+  <button class="cart-btn" id="openCart" aria-label="Ouvrir le panier">
+    🛒 <span>Panier</span> <b id="cartCount">0</b>
+  </button>
+</header>
+
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <p class="eyebrow">Bienvenue</p>
+    <h1>Tout ce qu'il vous faut, <em>livré chez vous.</em></h1>
+    <p class="lead">Choisissez vos produits, ajoutez-les au panier et envoyez votre commande en un clic sur WhatsApp.</p>
+    <a class="btn primary" href="#catalogue">Voir le catalogue</a>
+  </div>
+</section>
+
+<section class="perks">
+  <div>🚚 <b>Livraison rapide</b><span>Partout dans votre ville</span></div>
+  <div>💬 <b>Commande WhatsApp</b><span>Simple, sans compte</span></div>
+  <div>✅ <b>Produits de qualité</b><span>Sélectionnés avec soin</span></div>
+</section>
+
+<main id="catalogue" class="container">
+  <div class="section-head">
+    <h2>Notre catalogue</h2>
+    <select id="sort" aria-label="Trier">
+      <option value="default">Trier : Pertinence</option>
+      <option value="asc">Prix croissant</option>
+      <option value="desc">Prix décroissant</option>
+      <option value="name">Nom (A–Z)</option>
+    </select>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>Aucun produit ne correspond à votre recherche.</p>
+</main>
+
+<section class="container how">
+  <h2>Comment commander ?</h2>
+  <ol>
+    <li><b>Choisissez</b> vos produits et ajoutez-les au panier.</li>
+    <li><b>Renseignez</b> votre nom et votre adresse de livraison.</li>
+    <li><b>Envoyez</b> la commande sur WhatsApp : nous confirmons et livrons.</li>
+  </ol>
+</section>
+
+<footer class="footer">
+  <p><b id="footBrand">Ma Boutique</b> · Contact : <a id="footWa" href="#">WhatsApp</a></p>
+  <p class="small">© <span id="year"></span> Tous droits réservés.</p>
+</footer>
+
+<!-- Panier -->
+<div class="overlay" id="overlay" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <h3>Votre panier</h3>
+    <button id="closeCart" aria-label="Fermer">✕</button>
+  </div>
+  <div class="drawer-body" id="cartItems"></div>
+  <div class="drawer-foot">
+    <div class="total"><span>Total</span><b id="cartTotal">0 FCFA</b></div>
+    <form id="orderForm">
+      <input name="name" placeholder="Votre nom" required>
+      <input name="phone" placeholder="Votre téléphone" required inputmode="tel">
+      <textarea name="address" placeholder="Adresse de livraison" rows="2" required></textarea>
+      <button class="btn primary full" type="submit">Commander sur WhatsApp</button>
+    </form>
+    <button class="link" id="clearCart">Vider le panier</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="products.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
