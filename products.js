@@ -1,4 +1,4 @@
-* Fichier généré par admin.html – vous pouvez aussi l'éditer à la main.
+/* Fichier généré par admin.html – vous pouvez aussi l'éditer à la main.
    Après chaque modification dans la page admin, téléchargez le nouveau
    products.js et remplacez celui de votre hébergeur. */
 const PRODUCTS = [
